@@ -1,2 +1,3 @@
-# llm-radio
+# LLM Radio
+
 LLM over DNS|SSH
