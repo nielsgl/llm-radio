@@ -98,13 +98,13 @@ This project is being built incrementally. Here is the development roadmap:
 1.  **Run the Servers:**
     Use the `run-servers` tool to start both the API and DNS servers concurrently.
     ```bash
-    uv tool run-servers
+    uv run run-servers
     ```
 
 2.  **Query via the Chat Interface:**
     Launch the Gradio client with the `chat` tool.
     ```bash
-    uv tool chat
+    uv run chat
     ```
 
 3.  **Query via the Command Line:**
