@@ -19,6 +19,7 @@ dependencies = [
 [project.scripts]
 llm-radio = "llm_radio:main"
 run-servers = "scripts.run_servers:main"
+chat = "llm_radio.client:main"
 
 [build-system]
 requires = ["uv_build>=0.8.4,<0.9.0"]

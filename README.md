@@ -101,7 +101,13 @@ This project is being built incrementally. Here is the development roadmap:
     uv tool run-servers
     ```
 
-2.  **Query the server:**
+2.  **Query via the Chat Interface:**
+    Launch the Gradio client with the `chat` tool.
+    ```bash
+    uv tool chat
+    ```
+
+3.  **Query via the Command Line:**
     ```bash
     dig @localhost -p 1053 "your question here" TXT +short
     ```
