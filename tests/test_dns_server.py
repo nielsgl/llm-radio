@@ -3,7 +3,23 @@ from dnslib.server import DNSServer
 import requests
 from requests_mock import Mocker
 
-from llm_radio.dns_server import ApiResolver, create_server
+from llm_radio.dns_server import ApiResolver, chunk_answer, create_server
+
+
+def test_chunk_answer() -> None:
+    """
+    Tests the chunk_answer helper function.
+    """
+    long_string = "a" * 300
+    chunks = chunk_answer(long_string, chunk_size=255)
+    assert len(chunks) == 2
+    assert chunks[0] == b"a" * 255
+    assert chunks[1] == b"a" * 45
+
+    very_long_string = "b" * 5000
+    chunks = chunk_answer(very_long_string, max_len=4096, chunk_size=255)
+    assert len(b"".join(chunks)) == 4096
+    assert chunks[-1].endswith(b"...")
 
 
 def test_resolve_txt_query_success(requests_mock: Mocker) -> None:
@@ -20,6 +36,24 @@ def test_resolve_txt_query_success(requests_mock: Mocker) -> None:
 
     assert len(response.rr) == 1
     assert response.rr[0].rdata.toZone() == '"Mocked API answer."'
+
+
+def test_resolve_long_answer_chunking(requests_mock: Mocker) -> None:
+    """
+    Tests that a long answer is correctly chunked.
+    """
+    long_answer = "a" * 500
+    api_url = "http://test.com/q/"
+    requests_mock.get(api_url, json={"answer": long_answer})
+
+    resolver = ApiResolver(api_url=api_url)
+    request = DNSRecord.question("long question", qtype="TXT")
+
+    response = resolver.resolve(request, handler=None)  # type: ignore
+
+    # dnslib's toZone() will concatenate the chunks with quotes
+    expected_zone = f'"{"a" * 255}" "{"a" * 245}"'
+    assert response.rr[0].rdata.toZone() == expected_zone
 
 
 def test_resolve_txt_query_api_error(requests_mock: Mocker) -> None:

@@ -6,6 +6,18 @@ from dnslib.server import BaseResolver, DNSServer
 import requests
 
 
+def chunk_answer(answer: str, max_len: int = 4096, chunk_size: int = 255) -> list[bytes]:
+    """
+    Chunks a string into a list of bytes, each chunk not exceeding
+    chunk_size, with a total max length of max_len.
+    """
+    if len(answer) > max_len:
+        answer = answer[: max_len - 3] + "..."
+
+    encoded_answer = answer.encode("utf-8")
+    return [encoded_answer[i : i + chunk_size] for i in range(0, len(encoded_answer), chunk_size)]
+
+
 class ApiResolver(BaseResolver):
     """
     A DNS resolver that queries the API server to get the answer.
@@ -35,7 +47,8 @@ class ApiResolver(BaseResolver):
                 response = requests.get(self.api_url, params={"q": question}, timeout=5)
                 response.raise_for_status()
                 answer = response.json()["answer"]
-                reply.add_answer(RR(qname, QTYPE.TXT, rdata=TXT(answer)))
+                chunked_answer = chunk_answer(answer)
+                reply.add_answer(RR(qname, QTYPE.TXT, rdata=TXT(chunked_answer)))
             except requests.exceptions.RequestException as e:
                 print(f"Error calling API: {e}")
                 reply.header.rcode = 2  # SERVFAIL
