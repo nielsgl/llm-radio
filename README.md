@@ -95,17 +95,13 @@ This project is being built incrementally. Here is the development roadmap:
 
 ## Usage
 
-1.  **Run the API Server:**
+1.  **Run the Servers:**
+    Use the `run-servers` tool to start both the API and DNS servers concurrently.
     ```bash
-    uv run uvicorn llm_radio.api_server:app --host 0.0.0.0 --port 8000
+    uv tool run-servers
     ```
 
-2.  **Run the DNS Server (in a separate terminal):**
-    ```bash
-    uv run python src/llm_radio/dns_server.py
-    ```
-
-3.  **Query the server:**
+2.  **Query the server:**
     ```bash
     dig @localhost -p 1053 "your question here" TXT +short
     ```
