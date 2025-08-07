@@ -57,6 +57,7 @@ def create_chat_interface() -> gr.Blocks:  # pragma: no cover
             ],
             title="Chat with LLM Radio",
             chatbot=gr.Chatbot(type="messages"),
+            type="messages",
         )
     return demo
 
