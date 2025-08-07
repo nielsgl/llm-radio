@@ -30,6 +30,7 @@ dev = [
     "pre-commit>=4.2.0",
     "pydantic>=2.11.7",
     "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
     "pytest-cov>=6.2.1",
     "python-dotenv>=1.1.1",
     "requests-mock>=1.12.1",
@@ -52,6 +53,7 @@ force-sort-within-sections = true
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
+asyncio_mode = "auto"
 
 [tool.coverage.run]
 source = ["src/llm_radio"]
