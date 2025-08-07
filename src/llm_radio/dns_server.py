@@ -49,10 +49,12 @@ class ApiResolver(BaseResolver):
 
         if qtype == QTYPE.TXT:
             question = str(qname).rstrip(".")
+            logging.info(f"Received question: {question}")
             try:
-                response = requests.get(self.api_url, params={"q": question}, timeout=5)
+                response = requests.get(self.api_url, params={"q": question}, timeout=10)
                 response.raise_for_status()
                 answer = response.json()["answer"]
+                logging.info(f"Received answer from API: {answer[:100]}...")
                 chunked_answer = chunk_answer(answer)
                 reply.add_answer(RR(qname, QTYPE.TXT, rdata=TXT(chunked_answer)))
             except requests.exceptions.RequestException as e:

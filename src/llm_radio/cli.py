@@ -37,9 +37,9 @@ def run_servers():
 
     # Start threads to log the output from each process
     threading.Thread(target=log_stream, args=(api_process.stdout, "api")).start()
-    threading.Thread(target=log_stream, args=(api_process.stderr, "api-err")).start()
+    threading.Thread(target=log_stream, args=(api_process.stderr, "api")).start()
     threading.Thread(target=log_stream, args=(dns_process.stdout, "dns")).start()
-    threading.Thread(target=log_stream, args=(dns_process.stderr, "dns-err")).start()
+    threading.Thread(target=log_stream, args=(dns_process.stderr, "dns")).start()
 
     try:
         while api_process.poll() is None and dns_process.poll() is None:

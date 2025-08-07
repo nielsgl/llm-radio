@@ -56,6 +56,7 @@ def create_chat_interface() -> gr.Blocks:  # pragma: no cover
                 ["Explain the DNS protocol in one sentence."],
             ],
             title="Chat with LLM Radio",
+            chatbot=gr.Chatbot(type="messages"),
         )
     return demo
 

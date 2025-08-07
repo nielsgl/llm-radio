@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
+import logging
 import os
 
 from dotenv import load_dotenv
 import dspy
 from fastapi import FastAPI
+
+logging.basicConfig(level=logging.INFO, format="[api] %(message)s")
 
 
 @asynccontextmanager
@@ -49,5 +52,7 @@ def read_question(q: str) -> dict[str, str]:
     """
     Accepts a question and returns an answer from the LLM.
     """
+    logging.info(f"Received question: {q}")
     result = predictor(question=q)
+    logging.info(f"Sending answer: {result.answer[:100]}...")
     return {"answer": result.answer}
