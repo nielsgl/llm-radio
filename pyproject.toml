@@ -46,3 +46,14 @@ ignore = ["W505"]
 
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.coverage.run]
+source = ["src/llm_radio"]
+
+[tool.coverage.report]
+omit = [
+    "src/llm_radio/__init__.py",
+]
