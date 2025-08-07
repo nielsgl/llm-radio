@@ -24,10 +24,10 @@ Run the servers or the chat client directly from GitHub (requires `uv` to be ins
 
 ```bash
 # Run the chat client
-uv tool run --from gh:nielsgl/llm-radio chat
+uvx --no-cache --from git+https://github.com/nielsgl/llm-radio chat
 
 # Run the servers (requires a .env file in the current directory)
-uv tool run --from gh:nielsgl/llm-radio servers
+uvx --no-cache --from git+https://github.com/nielsgl/llm-radio servers
 ```
 
 ## 🏛️ Architecture
