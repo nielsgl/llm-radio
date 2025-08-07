@@ -22,7 +22,7 @@ Serve Large Language Model (LLM) responses over the DNS protocol. This project p
 
 This project is being built incrementally. Here is the development roadmap:
 
-- [ ] **Step 1: Project Scaffolding & Initial Documentation**
+- [x] **Step 1: Project Scaffolding & Initial Documentation**
 - [ ] **Step 2: Implement the Core API Server**
 - [ ] **Step 3: Implement the Core DNS Server**
 - [ ] **Step 4: Integrate DNS and API Servers**
