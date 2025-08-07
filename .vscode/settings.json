@@ -1,3 +1,9 @@
 {
-    "python.analysis.typeCheckingMode": "standard"
+    "python.analysis.typeCheckingMode": "standard",
+    "python.analysis.extraPaths": [
+        "src/llm_radio"
+    ],
+    "python.autoComplete.extraPaths": [
+        "src/llm_radio"
+    ]
 }
