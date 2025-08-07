@@ -3,16 +3,20 @@ from typing import Any
 
 from dnslib import QTYPE, RR, TXT
 from dnslib.server import BaseResolver, DNSServer
+import requests
 
 
-class HardcodedResolver(BaseResolver):
+class ApiResolver(BaseResolver):
     """
-    A DNS resolver that returns a hardcoded TXT record for any TXT query.
+    A DNS resolver that queries the API server to get the answer.
     """
+
+    def __init__(self, api_url: str = "http://127.0.0.1:8000/q/"):
+        self.api_url = api_url
 
     def resolve(self, request: Any, handler: Any) -> Any:
         """
-        Resolves the DNS request.
+        Resolves the DNS request by calling the API server.
 
         Args:
             request: The DNS request packet.
@@ -26,13 +30,15 @@ class HardcodedResolver(BaseResolver):
         qtype = request.q.qtype
 
         if qtype == QTYPE.TXT:
-            reply.add_answer(
-                RR(
-                    qname,
-                    QTYPE.TXT,
-                    rdata=TXT("This is a hardcoded DNS answer."),
-                )
-            )
+            question = str(qname).rstrip(".")
+            try:
+                response = requests.get(self.api_url, params={"q": question}, timeout=5)
+                response.raise_for_status()
+                answer = response.json()["answer"]
+                reply.add_answer(RR(qname, QTYPE.TXT, rdata=TXT(answer)))
+            except requests.exceptions.RequestException as e:
+                print(f"Error calling API: {e}")
+                reply.header.rcode = 2  # SERVFAIL
         else:
             reply.header.rcode = 2  # NOTIMP
 
@@ -41,7 +47,7 @@ class HardcodedResolver(BaseResolver):
 
 def create_server(address: str = "0.0.0.0", port: int = 1053) -> DNSServer:
     """Creates a DNSServer instance."""
-    resolver = HardcodedResolver()
+    resolver = ApiResolver()
     return DNSServer(resolver, port=port, address=address)
 
 
