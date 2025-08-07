@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 from typing import Any
@@ -6,6 +7,8 @@ from dnslib import QTYPE, RR, TXT
 from dnslib.server import BaseResolver, DNSServer
 from dotenv import load_dotenv
 import requests
+
+logging.basicConfig(level=logging.INFO, format="[dns] %(message)s")
 
 
 def chunk_answer(answer: str, max_len: int = 4096, chunk_size: int = 255) -> list[bytes]:
@@ -53,7 +56,7 @@ class ApiResolver(BaseResolver):
                 chunked_answer = chunk_answer(answer)
                 reply.add_answer(RR(qname, QTYPE.TXT, rdata=TXT(chunked_answer)))
             except requests.exceptions.RequestException as e:
-                print(f"Error calling API: {e}")
+                logging.error(f"Error calling API: {e}")
                 reply.header.rcode = 2  # SERVFAIL
         else:
             reply.header.rcode = 2  # NOTIMP
@@ -72,7 +75,7 @@ def main() -> None:  # pragma: no cover
     Starts the DNS server.
     """
     server = create_server()
-    print("Starting DNS server on port 1053...")
+    logging.info("Starting DNS server on port 1053...")
     server.start_thread()
     try:
         while True:
@@ -80,7 +83,7 @@ def main() -> None:  # pragma: no cover
     except KeyboardInterrupt:
         pass
     finally:
-        print("Stopping DNS server.")
+        logging.info("Stopping DNS server.")
         server.stop()
 
 

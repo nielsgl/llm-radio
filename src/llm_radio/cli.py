@@ -1,10 +1,19 @@
 import subprocess
+import sys
+import threading
 import time
+
+
+def log_stream(stream, prefix):
+    """Reads a stream line by line and prints it with a prefix."""
+    for line in iter(stream.readline, ""):
+        sys.stdout.write(f"[{prefix}] {line}")
+    stream.close()
 
 
 def run_servers():
     """
-    Runs the API and DNS servers concurrently.
+    Runs the API and DNS servers concurrently, capturing and prefixing their logs.
     """
     api_command = [
         "uvicorn",
@@ -16,21 +25,30 @@ def run_servers():
     ]
     dns_command = ["python", "-m", "llm_radio.dns_server"]
 
-    print("Starting API server...")
-    # We don't need `uv run` here because the script itself is run via `uv run`,
-    # so it's already in the correct environment.
-    api_process = subprocess.Popen(api_command)
+    print("[cli] Starting API server...")
+    api_process = subprocess.Popen(
+        api_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+    )
 
-    print("Starting DNS server...")
-    dns_process = subprocess.Popen(dns_command)
+    print("[cli] Starting DNS server...")
+    dns_process = subprocess.Popen(
+        dns_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+    )
+
+    # Start threads to log the output from each process
+    threading.Thread(target=log_stream, args=(api_process.stdout, "api")).start()
+    threading.Thread(target=log_stream, args=(api_process.stderr, "api-err")).start()
+    threading.Thread(target=log_stream, args=(dns_process.stdout, "dns")).start()
+    threading.Thread(target=log_stream, args=(dns_process.stderr, "dns-err")).start()
 
     try:
-        while True:
-            time.sleep(1)
+        while api_process.poll() is None and dns_process.poll() is None:
+            time.sleep(0.5)
     except KeyboardInterrupt:
-        print("\nStopping servers...")
+        print("\n[cli] Stopping servers...")
+    finally:
         api_process.terminate()
         dns_process.terminate()
         api_process.wait()
         dns_process.wait()
-        print("Servers stopped.")
+        print("[cli] Servers stopped.")
