@@ -1,5 +1,6 @@
 from dnslib import DNSRecord
 from dnslib.server import DNSServer
+import pytest
 import requests
 from requests_mock import Mocker
 
@@ -22,14 +23,15 @@ def test_chunk_answer() -> None:
     assert chunks[-1].endswith(b"...")
 
 
-def test_resolve_txt_query_success(requests_mock: Mocker) -> None:
+def test_resolve_txt_query_success(requests_mock: Mocker, monkeypatch: pytest.MonkeyPatch) -> None:
     """
     Tests that the ApiResolver returns the correct response from the API.
     """
     api_url = "http://test.com/q/"
+    monkeypatch.setenv("API_URL", api_url)
     requests_mock.get(api_url, json={"answer": "Mocked API answer."})
 
-    resolver = ApiResolver(api_url=api_url)
+    resolver = ApiResolver()
     request = DNSRecord.question("test question", qtype="TXT")
 
     response = resolver.resolve(request, handler=None)  # type: ignore
@@ -38,15 +40,18 @@ def test_resolve_txt_query_success(requests_mock: Mocker) -> None:
     assert response.rr[0].rdata.toZone() == '"Mocked API answer."'
 
 
-def test_resolve_long_answer_chunking(requests_mock: Mocker) -> None:
+def test_resolve_long_answer_chunking(
+    requests_mock: Mocker, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """
     Tests that a long answer is correctly chunked.
     """
     long_answer = "a" * 500
     api_url = "http://test.com/q/"
+    monkeypatch.setenv("API_URL", api_url)
     requests_mock.get(api_url, json={"answer": long_answer})
 
-    resolver = ApiResolver(api_url=api_url)
+    resolver = ApiResolver()
     request = DNSRecord.question("long question", qtype="TXT")
 
     response = resolver.resolve(request, handler=None)  # type: ignore
@@ -56,14 +61,17 @@ def test_resolve_long_answer_chunking(requests_mock: Mocker) -> None:
     assert response.rr[0].rdata.toZone() == expected_zone
 
 
-def test_resolve_txt_query_api_error(requests_mock: Mocker) -> None:
+def test_resolve_txt_query_api_error(
+    requests_mock: Mocker, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """
     Tests that the ApiResolver returns a SERVFAIL error when the API call fails.
     """
     api_url = "http://test.com/q/"
+    monkeypatch.setenv("API_URL", api_url)
     requests_mock.get(api_url, exc=requests.exceptions.ConnectionError)
 
-    resolver = ApiResolver(api_url=api_url)
+    resolver = ApiResolver()
     request = DNSRecord.question("test question", qtype="TXT")
 
     response = resolver.resolve(request, handler=None)  # type: ignore

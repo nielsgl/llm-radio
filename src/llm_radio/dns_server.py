@@ -1,8 +1,10 @@
+import os
 import time
 from typing import Any
 
 from dnslib import QTYPE, RR, TXT
 from dnslib.server import BaseResolver, DNSServer
+from dotenv import load_dotenv
 import requests
 
 
@@ -23,8 +25,9 @@ class ApiResolver(BaseResolver):
     A DNS resolver that queries the API server to get the answer.
     """
 
-    def __init__(self, api_url: str = "http://127.0.0.1:8000/q/"):
-        self.api_url = api_url
+    def __init__(self) -> None:
+        load_dotenv()
+        self.api_url = os.getenv("API_URL", "http://127.0.0.1:8000/q/")
 
     def resolve(self, request: Any, handler: Any) -> Any:
         """
