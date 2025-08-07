@@ -18,7 +18,7 @@ dependencies = [
 
 [project.scripts]
 llm-radio = "llm_radio:main"
-run-servers = "scripts.run_servers:main"
+run-servers = "llm_radio.cli:run_servers"
 chat = "llm_radio.client:main"
 
 [build-system]
