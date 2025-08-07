@@ -24,7 +24,7 @@ This project is being built incrementally. Here is the development roadmap:
 
 - [x] **Step 1: Project Scaffolding & Initial Documentation**
 - [x] **Step 2: Implement the Core API Server**
-- [ ] **Step 3: Implement the Core DNS Server**
+- [x] **Step 3: Implement the Core DNS Server**
 - [ ] **Step 4: Integrate DNS and API Servers**
 - [ ] **Step 5: Add DSPy LLM Logic to API Server**
 - [ ] **Step 6: Finalize Error Handling and Edge Cases**
