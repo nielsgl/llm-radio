@@ -18,7 +18,7 @@ dependencies = [
 
 [project.scripts]
 llm-radio = "llm_radio:main"
-run-servers = "llm_radio.cli:run_servers"
+servers = "llm_radio.cli:run_servers"
 chat = "llm_radio.client:main"
 
 [build-system]
@@ -69,5 +69,5 @@ omit = [
 
 
 [tool.uv.tools]
-run-servers = { "module" = "llm_radio.cli", "callable" = "run_servers" }
+servers = { "module" = "llm_radio.cli", "callable" = "run_servers" }
 chat = { "module" = "llm_radio.client", "callable" = "main" }

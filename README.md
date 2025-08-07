@@ -20,10 +20,14 @@ Serve Large Language Model (LLM) responses over the DNS protocol. This project p
 
 ## ⚡ Quick Start
 
-Run the chat client directly from GitHub (requires `uv` to be installed):
+Run the servers or the chat client directly from GitHub (requires `uv` to be installed):
 
 ```bash
+# Run the chat client
 uv tool run --from gh:nielsgl/llm-radio chat
+
+# Run the servers (requires a .env file in the current directory)
+uv tool run --from gh:nielsgl/llm-radio servers
 ```
 
 ## 🏛️ Architecture
@@ -104,13 +108,13 @@ This project is being built incrementally. Here is the development roadmap:
 ## Usage
 
 1.  **Run the Servers:**
-    Use the `run-servers` tool to start both the API and DNS servers concurrently.
+    Use the `servers` command to start both the API and DNS servers concurrently.
     ```bash
-    uv run run-servers
+    uv run servers
     ```
 
 2.  **Query via the Chat Interface:**
-    Launch the Gradio client with the `chat` tool.
+    Launch the Gradio client with the `chat` command.
     ```bash
     uv run chat
     ```
