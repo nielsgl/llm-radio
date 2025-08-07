@@ -8,7 +8,7 @@ from dnslib.server import BaseResolver, DNSServer
 from dotenv import load_dotenv
 import requests
 
-logging.basicConfig(level=logging.INFO, format="[dns] %(message)s")
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
 
 def chunk_answer(answer: str, max_len: int = 4096, chunk_size: int = 255) -> list[bytes]:
@@ -49,7 +49,8 @@ class ApiResolver(BaseResolver):
 
         if qtype == QTYPE.TXT:
             question = str(qname).rstrip(".")
-            logging.info(f"Received question: {question}")
+            pretty_question = question.replace("\\032", " ")
+            logging.info(f"Received question: {pretty_question}")
             try:
                 response = requests.get(self.api_url, params={"q": question}, timeout=10)
                 response.raise_for_status()
