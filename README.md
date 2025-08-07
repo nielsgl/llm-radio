@@ -18,6 +18,14 @@ Serve Large Language Model (LLM) responses over the DNS protocol. This project p
 *   Fully type-annotated, linted, and tested codebase.
 *   Extensible architecture for adding new protocols.
 
+## ⚡ Quick Start
+
+Run the chat client directly from GitHub (requires `uv` to be installed):
+
+```bash
+uv tool run --from gh:nielsgl/llm-radio chat
+```
+
 ## 🏛️ Architecture
 
 The system consists of two core servers and a Gradio-based client. The servers can be run locally for development or deployed to a public server.

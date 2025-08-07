@@ -66,3 +66,8 @@ source = ["src/llm_radio"]
 omit = [
     "src/llm_radio/__init__.py",
 ]
+
+
+[tool.uv.tools]
+run-servers = { "module" = "llm_radio.cli", "callable" = "run_servers" }
+chat = { "module" = "llm_radio.client", "callable" = "main" }
