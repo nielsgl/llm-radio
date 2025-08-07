@@ -3,12 +3,13 @@ import os
 import time
 from typing import Any
 
+import coloredlogs
 from dnslib import QTYPE, RR, TXT
 from dnslib.server import BaseResolver, DNSServer
 from dotenv import load_dotenv
 import requests
 
-logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
+coloredlogs.install(level="INFO", fmt="[%(levelname)s] %(message)s")
 
 
 def chunk_answer(answer: str, max_len: int = 4096, chunk_size: int = 255) -> list[bytes]:

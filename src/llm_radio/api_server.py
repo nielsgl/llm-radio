@@ -2,17 +2,21 @@ from contextlib import asynccontextmanager
 import logging
 import os
 
+import coloredlogs
 from dotenv import load_dotenv
 import dspy
 from fastapi import FastAPI
 
-logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
+coloredlogs.install(level="INFO", fmt="[%(levelname)s] %(message)s")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load environment variables from .env file
     load_dotenv()
+
+    # Suppress verbose logs from the litellm library
+    logging.getLogger("litellm").setLevel(logging.WARNING)
 
     # Configure the language model
     model_name = os.getenv("LLM_MODEL")

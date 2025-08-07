@@ -1,19 +1,13 @@
+import os
+import pty
+import select
 import subprocess
-import sys
-import threading
-import time
-
-
-def log_stream(stream, prefix):
-    """Reads a stream line by line and prints it with a prefix."""
-    for line in iter(stream.readline, ""):
-        sys.stdout.write(f"[{prefix}] {line}")
-    stream.close()
 
 
 def run_servers():
     """
-    Runs the API and DNS servers concurrently, capturing and prefixing their logs.
+    Runs the API and DNS servers concurrently using pseudo-terminals (ptys)
+    to preserve colorized output.
     """
     api_command = [
         "uvicorn",
@@ -25,30 +19,37 @@ def run_servers():
     ]
     dns_command = ["python", "-m", "llm_radio.dns_server"]
 
-    print("[cli] Starting API server...")
-    api_process = subprocess.Popen(
-        api_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-    )
+    masters = {}
+    processes = {}
 
-    print("[cli] Starting DNS server...")
-    dns_process = subprocess.Popen(
-        dns_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-    )
+    for name, command in [("api", api_command), ("dns", dns_command)]:
+        master, slave = pty.openpty()
+        proc = subprocess.Popen(command, stdout=slave, stderr=slave)
+        os.close(slave)
+        masters[master] = name
+        processes[name] = proc
 
-    # Start threads to log the output from each process
-    threading.Thread(target=log_stream, args=(api_process.stdout, "api")).start()
-    threading.Thread(target=log_stream, args=(api_process.stderr, "api")).start()
-    threading.Thread(target=log_stream, args=(dns_process.stdout, "dns")).start()
-    threading.Thread(target=log_stream, args=(dns_process.stderr, "dns")).start()
+    print("[cli] [INFO] Starting API and DNS servers...")
 
     try:
-        while api_process.poll() is None and dns_process.poll() is None:
-            time.sleep(0.5)
+        while masters:
+            readable, _, _ = select.select(masters.keys(), [], [], 0.1)
+            for master in readable:
+                try:
+                    data = os.read(master, 1024)
+                    if not data:
+                        # Process has finished
+                        masters.pop(master)
+                        continue
+                    prefix = f"[{masters[master]}] ".encode()
+                    os.write(1, prefix + data.replace(b"\n", b"\n" + prefix)[: -len(prefix)])
+                except OSError:
+                    masters.pop(master)
     except KeyboardInterrupt:
-        print("\n[cli] Stopping servers...")
+        print("\n[cli] [INFO] Stopping servers...")
     finally:
-        api_process.terminate()
-        dns_process.terminate()
-        api_process.wait()
-        dns_process.wait()
-        print("[cli] Servers stopped.")
+        for proc in processes.values():
+            proc.terminate()
+        for proc in processes.values():
+            proc.wait()
+        print("[cli] [INFO] Servers stopped.")
