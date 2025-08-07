@@ -23,7 +23,7 @@ Serve Large Language Model (LLM) responses over the DNS protocol. This project p
 This project is being built incrementally. Here is the development roadmap:
 
 - [x] **Step 1: Project Scaffolding & Initial Documentation**
-- [ ] **Step 2: Implement the Core API Server**
+- [x] **Step 2: Implement the Core API Server**
 - [ ] **Step 3: Implement the Core DNS Server**
 - [ ] **Step 4: Integrate DNS and API Servers**
 - [ ] **Step 5: Add DSPy LLM Logic to API Server**
@@ -40,14 +40,13 @@ This project is being built incrementally. Here is the development roadmap:
 2.  **Create a virtual environment and install dependencies:**
     This project uses `uv` for package management.
     ```bash
-    uv venv
-    source .venv/bin/activate
+    uv venv --clear
     uv sync --all-extras
     ```
 
 3.  **Set up pre-commit hooks:**
     ```bash
-    pre-commit install
+    uv run pre-commit install
     ```
 
 4.  **Configure Environment Variables:**
@@ -60,12 +59,12 @@ This project is being built incrementally. Here is the development roadmap:
 
 1.  **Run the API Server:**
     ```bash
-    uvicorn src.llm_radio.api_server:app --host 0.0.0.0 --port 8000
+    uv run uvicorn src.llm_radio.api_server:app --host 0.0.0.0 --port 8000
     ```
 
 2.  **Run the DNS Server (in a separate terminal):**
     ```bash
-    python src/llm_radio/dns_server.py
+    uv run python src/llm_radio/dns_server.py
     ```
 
 3.  **Query the server:**
@@ -78,4 +77,4 @@ This project is being built incrementally. Here is the development roadmap:
 To run the test suite and generate a coverage report:
 
 ```bash
-pytest --cov=src/llm_radio --cov-report=term-missing --cov-fail-under=90
+uv run pytest --cov=src/llm_radio --cov-report=term-missing --cov-fail-under=90
